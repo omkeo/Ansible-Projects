@@ -1,6 +1,6 @@
 ---
 - name: Install Nginx on AWS EC2 (Ubuntu)
-  hosts: localhost
+  hosts: all
   become: yes
   tasks:
     - name: Update package lists
