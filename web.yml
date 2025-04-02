@@ -1,0 +1,22 @@
+---
+- name: Deploy a simple HTML file to Nginx
+  hosts: all
+  become: yes
+  tasks:
+    - name: Install Nginx
+      apt:
+        name: nginx
+        state: present
+
+    - name: Copy HTML file
+      copy:
+        src: index.html
+        dest: /var/www/html/index.html
+        owner: www-data
+        group: www-data
+        mode: '0644'
+
+    - name: Restart Nginx
+      service:
+        name: nginx
+        state: restarted
