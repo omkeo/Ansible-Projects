@@ -1,0 +1,33 @@
+---
+- name: 🎮 Guess The Number Game
+  hosts: localhost
+  connection: local
+
+  vars:
+    secret_number: "{{ 1 + (5 | random) }}"
+
+  tasks:
+
+    - name: Welcome Message
+      debug:
+        msg: "🎯 Guess a number between 1 and 5"
+
+    - name: Take user input
+      pause:
+        prompt: "Enter your guess"
+
+      register: user_input
+
+    - name: Show your guess
+      debug:
+        msg: "You guessed: {{ user_input.user_input }}"
+
+    - name: Check result (WIN)
+      debug:
+        msg: "🎉 Correct! You Win!"
+      when: user_input.user_input | int == secret_number
+
+    - name: Check result (LOSE)
+      debug:
+        msg: "❌ Wrong! The number was {{ secret_number }}"
+      when: user_input.user_input | int != secret_number
