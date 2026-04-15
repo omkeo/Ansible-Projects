@@ -12,6 +12,8 @@
         instance_type: t2.micro
         image_id: ami-0e12ffc2dd465f6e4
         region: ap-south-1
-        security_groups: ["default"]
+        vpc_subnet_id: subnet-abc123
+        assign_public_ip: true
+        security_group: default
         count: 1
         wait: yes
