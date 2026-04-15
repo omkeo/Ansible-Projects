@@ -1,0 +1,9 @@
+---
+- name: Simple Playbook Example
+  hosts: all
+  become: no
+
+  tasks:
+    - name: Print a message
+      debug:
+        msg: "Hello, Ansible is working!"
