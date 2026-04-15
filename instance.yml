@@ -1,8 +1,8 @@
     - name: Create an EC2 instance
       amazon.aws.ec2_instance:
-        name: "AnsibleEC2"               # Change this to your desired instance name
-        key_name: my-key                  # Replace with your SSH key name
+        name: "Ansible1234"               # Change this to your desired instance name
+        key_name: Prit                 # Replace with your SSH key name
         instance_type: t2.micro            # Change instance type if needed
-        image_id: ami-12345678             # Replace with a valid AMI ID (Ubuntu, Amazon Linux, etc.)
-        region: us-east-1                  # Change to your AWS region
+        image_id: ami-0e12ffc2dd465f6e4             # Replace with a valid AMI ID (Ubuntu, Amazon Linux, etc.)
+        region: ap-south-1                  # Change to your AWS region
         security_groups: ["default"]        # Replace with your security group name
