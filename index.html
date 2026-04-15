@@ -1,57 +1,219 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ansible UI Dashboard</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        body { background-color: #f8f9fa; }
-        .card { margin-bottom: 20px; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ansible Smart Dashboard</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+
+<style>
+body {
+    background: linear-gradient(135deg, #0f2027, #2c5364, #6a11cb);
+    color: white;
+    font-family: 'Segoe UI', sans-serif;
+}
+
+/* Glass Card */
+.card {
+    background: rgba(255,255,255,0.08);
+    backdrop-filter: blur(15px);
+    border-radius: 20px;
+    border: none;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+    transition: 0.3s;
+}
+.card:hover {
+    transform: translateY(-8px) scale(1.02);
+}
+
+/* Header */
+.header {
+    text-align: center;
+    font-size: 2.7rem;
+    font-weight: bold;
+    background: linear-gradient(to right, #00f260, #0575e6);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+/* Button */
+.btn-run {
+    background: linear-gradient(45deg, #ff416c, #ff4b2b);
+    border: none;
+    color: white;
+    font-weight: bold;
+    transition: 0.3s;
+}
+.btn-run:hover {
+    transform: scale(1.1);
+    box-shadow: 0 0 20px #ff416c;
+}
+
+/* Logs */
+.logs {
+    height: 220px;
+    overflow-y: auto;
+    background: #000;
+    color: #00ffcc;
+    padding: 10px;
+    border-radius: 10px;
+    font-size: 13px;
+}
+
+/* Playbook hover */
+.list-group-item {
+    background: transparent;
+    color: white;
+    border: none;
+    transition: 0.3s;
+}
+.list-group-item:hover {
+    background: rgba(255,255,255,0.2);
+    transform: translateX(10px);
+}
+
+/* Fade animation */
+.fade-in {
+    animation: fadeIn 1s ease-in-out;
+}
+@keyframes fadeIn {
+    from {opacity: 0; transform: translateY(20px);}
+    to {opacity: 1; transform: translateY(0);}
+}
+</style>
 </head>
+
 <body>
-    <div class="container mt-4">
-        <h2 class="text-center mb-4">Ansible Playbook Dashboard</h2>
-        
-        <div class="row">
-            <div class="col-md-6">
-                <div class="card">
-                    <div class="card-header bg-primary text-white">Available Playbooks</div>
-                    <div class="card-body">
-                        <ul class="list-group">
-                            <li class="list-group-item">Install Nginx</li>
-                            <li class="list-group-item">Setup Docker</li>
-                            <li class="list-group-item">Deploy Application</li>
-                            <li class="list-group-item">Configure Firewall</li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="col-md-6">
-                <div class="card">
-                    <div class="card-header bg-success text-white">Execution Status</div>
-                    <div class="card-body">
-                        <p><strong>Last Run:</strong> 10 mins ago</p>
-                        <p><strong>Status:</strong> <span class="badge bg-success">Success</span></p>
-                        <button class="btn btn-warning">Run Again</button>
-                    </div>
-                </div>
+
+<div class="container mt-4 fade-in">
+
+    <div class="header mb-4">
+        🚀 Smart Ansible Dashboard
+    </div>
+
+    <div class="row">
+
+        <!-- Playbooks -->
+        <div class="col-md-6">
+            <div class="card p-3">
+                <h4><i class="fa-solid fa-server"></i> Playbooks</h4>
+                <ul class="list-group mt-3" id="playbooks">
+                    <li class="list-group-item">Install Nginx</li>
+                    <li class="list-group-item">Setup Docker</li>
+                    <li class="list-group-item">Deploy App</li>
+                    <li class="list-group-item">Configure Firewall</li>
+                </ul>
             </div>
         </div>
-        
-        <div class="card">
-            <div class="card-header bg-dark text-white">Playbook Logs</div>
-            <div class="card-body" style="height: 200px; overflow-y: auto; background-color: #e9ecef;">
-                <pre>PLAY [Install Nginx] ****************************************************
-TASK [Update package lists] ********************************************
-TASK [Install Nginx] ***************************************************
-TASK [Start and enable service] ***************************************
-PLAY RECAP *************************************************************
-</pre>
+
+        <!-- Status -->
+        <div class="col-md-6">
+            <div class="card p-3">
+                <h4><i class="fa-solid fa-chart-line"></i> Execution</h4>
+
+                <p><strong>Last Run:</strong> <span id="lastRun">Never</span></p>
+
+                <p><strong>Status:</strong> 
+                    <span id="statusBadge" class="badge bg-secondary">Idle</span>
+                </p>
+
+                <div class="progress mb-3">
+                    <div id="progressBar" class="progress-bar" style="width:0%">0%</div>
+                </div>
+
+                <button class="btn btn-run w-100" onclick="runPlaybook()">
+                    ▶ Run Playbook
+                </button>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Stats -->
+    <div class="row mt-4 text-center">
+        <div class="col-md-3">
+            <div class="card p-3">
+                <h5>Servers</h5>
+                <h2 id="servers">5</h2>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card p-3">
+                <h5>Tasks</h5>
+                <h2 id="tasks">0</h2>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card p-3">
+                <h5>Failures</h5>
+                <h2 id="failures" class="text-danger">0</h2>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card p-3">
+                <h5>Success %</h5>
+                <h2 id="successRate">0%</h2>
             </div>
         </div>
     </div>
+
+    <!-- Logs -->
+    <div class="card mt-4 p-3">
+        <h4><i class="fa-solid fa-terminal"></i> Live Logs</h4>
+        <div class="logs mt-3" id="logs"></div>
+    </div>
+
+</div>
+
+<script>
+function runPlaybook() {
+    let logs = document.getElementById("logs");
+    let progress = document.getElementById("progressBar");
+    let status = document.getElementById("statusBadge");
+
+    logs.innerHTML = "";
+    progress.style.width = "0%";
+    progress.innerText = "0%";
+    status.className = "badge bg-warning";
+    status.innerText = "Running";
+
+    let steps = [
+        "PLAY [Install Nginx]",
+        "TASK [Update packages]",
+        "TASK [Install nginx]",
+        "TASK [Start service]",
+        "TASK [Enable service]",
+        "PLAY RECAP"
+    ];
+
+    let i = 0;
+
+    let interval = setInterval(() => {
+        if (i < steps.length) {
+            logs.innerHTML += steps[i] + "\n";
+            logs.scrollTop = logs.scrollHeight;
+
+            let percent = Math.floor(((i+1)/steps.length)*100);
+            progress.style.width = percent + "%";
+            progress.innerText = percent + "%";
+
+            document.getElementById("tasks").innerText = i+1;
+
+            i++;
+        } else {
+            clearInterval(interval);
+
+            status.className = "badge bg-success";
+            status.innerText = "Success";
+
+            document.getElementById("lastRun").innerText = "Just Now";
+            document.getElementById("successRate").innerText = "100%";
+        }
+    }, 800);
+}
+</script>
+
 </body>
 </html>
