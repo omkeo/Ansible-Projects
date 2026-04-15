@@ -1,0 +1,56 @@
+---
+- name: Deploy Simple Website
+  hosts: localhost
+  become: yes
+  connection: local
+
+  tasks:
+
+    - name: Install nginx
+      apt:
+        name: nginx
+        state: present
+        update_cache: yes
+
+    - name: Start nginx
+      service:
+        name: nginx
+        state: started
+        enabled: yes
+
+    - name: Remove default index file
+      file:
+        path: /var/www/html/index.nginx-debian.html
+        state: absent
+
+    - name: Deploy custom website
+      copy:
+        dest: /var/www/html/om/index.html
+        content: |
+          <!DOCTYPE html>
+          <html>
+          <head>
+              <title>My Ansible Website</title>
+              <style>
+                  body {
+                      text-align: center;
+                      font-family: Arial;
+                      background: linear-gradient(to right, #00c6ff, #0072ff);
+                      color: white;
+                      margin-top: 100px;
+                  }
+                  h1 {
+                      font-size: 50px;
+                  }
+              </style>
+          </head>
+          <body>
+              <h1>🚀 Website Deployed with Ansible</h1>
+              <p>DevOps is awesome 😎</p>
+          </body>
+          </html>
+
+    - name: Restart nginx
+      service:
+        name: nginx
+        state: restarted
