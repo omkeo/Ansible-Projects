@@ -25,7 +25,7 @@
 
     - name: Deploy custom website
       copy:
-        dest: /var/www/html/om/index.html
+        dest: /var/www/html/index.html
         content: |
           <!DOCTYPE html>
           <html>
