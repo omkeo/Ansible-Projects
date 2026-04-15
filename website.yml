@@ -1,54 +1,90 @@
 ---
-- name: Deploy Simple Website
+- name: Advanced Website Deployment
   hosts: localhost
   become: yes
   connection: local
 
+  vars:
+    repo_url: "https://github.com/spring-projects/spring-petclinic.git"
+    web_root: "/var/www/html/myapp"
+
   tasks:
 
-    - name: Install nginx
+    - name: Install required packages
       apt:
-        name: nginx
+        name:
+          - nginx
+          - git
         state: present
         update_cache: yes
 
-    - name: Start nginx
-      service:
-        name: nginx
-        state: started
-        enabled: yes
-
-    - name: Remove default index file
+    - name: Remove default nginx site
       file:
         path: /var/www/html/index.nginx-debian.html
         state: absent
 
-    - name: Deploy custom website
+    - name: Create web directory
+      file:
+        path: "{{ web_root }}"
+        state: directory
+        mode: '0755'
+
+    - name: Clone website repo
+      git:
+        repo: "{{ repo_url }}"
+        dest: "{{ web_root }}"
+        force: yes
+
+    - name: Create simple index.html (fallback)
       copy:
-        dest: /var/www/html/index.html
+        dest: "{{ web_root }}/index.html"
         content: |
-          <!DOCTYPE html>
           <html>
           <head>
-              <title>My Ansible Website</title>
+              <title>Advanced Ansible Deployment</title>
               <style>
                   body {
-                      text-align: center;
-                      font-family: Arial;
-                      background: linear-gradient(to right, #00c6ff, #0072ff);
+                      background: linear-gradient(135deg, #667eea, #764ba2);
                       color: white;
+                      text-align: center;
                       margin-top: 100px;
-                  }
-                  h1 {
-                      font-size: 50px;
+                      font-family: Arial;
                   }
               </style>
           </head>
           <body>
-              <h1>🚀 Website Deployed with Ansible</h1>
-              <p>DevOps is awesome 😎</p>
+              <h1>🚀 Advanced Website Deployed</h1>
+              <p>Using Ansible + Nginx + Git</p>
           </body>
           </html>
+
+    - name: Configure Nginx
+      copy:
+        dest: /etc/nginx/sites-available/myapp
+        content: |
+          server {
+              listen 80;
+              server_name _;
+
+              root {{ web_root }};
+              index index.html;
+
+              location / {
+                  try_files $uri $uri/ =404;
+              }
+          }
+
+    - name: Enable site
+      file:
+        src: /etc/nginx/sites-available/myapp
+        dest: /etc/nginx/sites-enabled/myapp
+        state: link
+        force: yes
+
+    - name: Remove default config
+      file:
+        path: /etc/nginx/sites-enabled/default
+        state: absent
 
     - name: Restart nginx
       service:
