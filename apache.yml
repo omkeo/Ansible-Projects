@@ -1,6 +1,6 @@
 ---
 - name: Install Tomcat on EC2
-  hosts: web
+  hosts: localhost
   become: yes
 
   tasks:
