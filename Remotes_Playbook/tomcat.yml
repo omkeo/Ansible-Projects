@@ -1,0 +1,49 @@
+---
+- name: Install and Run Tomcat in /root
+  hosts: web
+  become: yes
+
+  vars:
+    tomcat_url: https://dlcdn.apache.org/tomcat/tomcat-9/v9.0.117/bin/apache-tomcat-9.0.117.zip
+    install_dir: /root/tomcat
+
+  tasks:
+
+    - name: Install Java
+      apt:
+        name: openjdk-11-jdk
+        state: present
+        update_cache: yes
+
+    - name: Install unzip
+      apt:
+        name: unzip
+        state: present
+
+    - name: Create Tomcat directory
+      file:
+        path: "{{ install_dir }}"
+        state: directory
+        mode: '0755'
+
+    - name: Download Tomcat zip
+      get_url:
+        url: "{{ tomcat_url }}"
+        dest: "{{ install_dir }}/tomcat.zip"
+        mode: '0644'
+
+    - name: Extract Tomcat
+      unarchive:
+        src: "{{ install_dir }}/tomcat.zip"
+        dest: "{{ install_dir }}"
+        remote_src: yes
+
+    - name: Set execute permission
+      file:
+        path: "{{ install_dir }}/apache-tomcat-9.0.117/bin"
+        mode: '0755'
+        recurse: yes
+
+    - name: Start Tomcat
+      shell: |
+        nohup {{ install_dir }}/apache-tomcat-9.0.117/bin/startup.sh &
