@@ -1,0 +1,21 @@
+---
+- name: File Module
+  hosts: web
+  become: yes
+
+  tasks:
+    - name: Creating a file
+      file:
+        path: /tmp/newfile.txt
+        state: touch
+        owner: root
+        group: root
+        mode: '0764'
+
+    - name: Creating a directory
+      file:
+        path: /tmp/myfolder
+        state: directory
+        owner: root
+        group: root
+        mode: '0755'
