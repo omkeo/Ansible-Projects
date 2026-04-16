@@ -1,12 +1,21 @@
 ---
-- name: Copying files to remote
-  hosts: all
+- name: Advanced file copy + create file
+  hosts: web
+  become: yes
 
   tasks:
-  - name: Copy files
-    copy:
-      src: /root/myfile.txt
-      dest: /tmp/
-      owner: root
-      group: root
-      backup: true
+    - name: Create directory
+      file:
+        path: /home/ubuntu/demo
+        state: directory
+        mode: '0755'
+
+    - name: Create file with content
+      copy:
+        dest: /home/ubuntu/demo/test.txt
+        content: |
+          Hello from Ansible 🚀
+          This file was created automatically.
+        owner: root
+        group: root
+        mode: '0644'
