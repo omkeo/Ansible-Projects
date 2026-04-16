@@ -7,7 +7,6 @@
     copy:
       src: /root/myfile.txt
       dest: /tmp/
-      owner: paul
-      group: paul
-      mode: ugo=rw
+      owner: root
+      group: root
       backup: true
